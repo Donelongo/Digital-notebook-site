@@ -1,5 +1,5 @@
 # Echo
-Our project topic will be  a Blogging website
+Our project topic will be  a digital notebook.
 
 Members
 1. Dagmawi Elias UGR/2465/14
