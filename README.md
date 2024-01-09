@@ -1,7 +1,7 @@
 # Echo
 
 Our project topic will be  a Digital Notebook.
-The Digital Notebook platform serves as a centralized repository enabling companies and their employees to collectively store and access notes within a unified interface. This solution facilitates seamless collaboration by allowing an administrator to oversee and manage all aspects, while providing controlled permissions for staff members.
+Our digital notebook is a website for a company where its employees take and share notes on it seamlessly. It allows an admin, capable of controlling everything, while staff members have restricted permissions.
 
 Members
 1. Dagmawi Elias UGR/2465/14
