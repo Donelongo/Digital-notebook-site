@@ -11,3 +11,5 @@ Members
 We will be using MySql a relational database. Reason for this actions:
 1. Well suited for enforcing structured schema. All notes will hence have toadhere to predefined to set of attributes.
 2. Efficient retrieival of notes based on their creator user(since it uses relationships between entities)
+
+we will have three modules. 1 auth-for authentication, 2. user- for authorization 3. note- for our feature notes.
