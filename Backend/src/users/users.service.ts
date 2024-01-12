@@ -1,76 +1,72 @@
-// users.service.ts
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
-import { UserRepository } from './users.repository'; // Import the UserRepository
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InsertValuesMissingError } from 'typeorm';
 
 @Injectable()
 export class UsersService {
 
-  constructor(
-    @InjectRepository(UserRepository)
-    private readonly userRepository: UserRepository, // Use UserRepository instead of Repository<User>
-  ) {}
+    private Users: Array<CreateUserDto> = [
+        {user_name: "d1longo", password: "123321", access_level: "Admin"},
+        {user_name: "Samra", password: "987789", access_level: "Admin"}
+    ]
 
-  async findOneByEmail(email: string): Promise<User | undefined> {
-    return this.userRepository.findOneByEmail(email);
-  }
-
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    return this.userRepository.createUser(createUserDto);
-  }
-
-  async update(userId: number, updateUserDto: UpdateUserDto, currentUser: User): Promise<User> {
-    const userToUpdate = await this.userRepository.findOneById(userId);
-    if (!userToUpdate) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
+    getUsers(){
+        return this.Users.map(({ user_name, access_level }) => ({ user_name, access_level }));
     }
-    return this.userRepository.updateUser(userToUpdate, updateUserDto);
-  }
 
-  async remove(userId: number, currentUser: User): Promise<void> {
-    if (currentUser.role !== 'admin') {
-      throw new ForbiddenException('You do not have permission to delete this account.');
+    getUser(user_name: string){
+        let user =  this.Users.find(Usr => Usr.user_name === user_name);
+
+        if(!user) {
+            throw new Error('User not found');
+        }
+
+        return user;
     }
-    const userToRemove = await this.userRepository.findOneById(userId);
-    if (!userToRemove) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
-    }};
 
-  async findOneById(id: number): Promise<User | undefined> {
-    return this.userRepository.findOneById(id);
-  }
-  async findOne(id: number): Promise<User | undefined> {
-    return this.userRepository.findOneById(id);
-  }
+    update_user(user_name: string, UpdatedUserData: UpdateUserDto){
 
-  async findAll(): Promise<User[]> {
-    return this.userRepository.find();
-  }
-  // Methods for testing
+        this.Users = this.Users.map( Usr => {
+            if(Usr.user_name === user_name){
+                return {...Usr, ...UpdatedUserData};
+            }
 
-  async findOneByEmailForTesting(email: string): Promise<User | undefined> {
-    return this.userRepository.findOneByEmailForTesting(email);
-  }
+            return Usr
+        })
 
-  async createUserForTesting(createUserDto: CreateUserDto): Promise<User> {
-    return this.userRepository.createUserForTesting(createUserDto);
-  }
+        return this.getUsers()
+    }
 
-  async updateUserForTesting(user: User, updateUserDto: UpdateUserDto): Promise<User> {
-    return this.userRepository.updateUserForTesting(user, updateUserDto);
-  }
+    adduser(user: CreateUserDto){
 
-  async removeUserForTesting(user: User): Promise<void> {
-    return this.userRepository.removeUserForTesting(user);
-  }
+        let Trigger:boolean = true;
 
-  async findOneByIdForTesting(id: number): Promise<User | undefined> {
-    return this.userRepository.findOneByIdForTesting(id);
-  }
+        this.Users.map(nt =>{
+            nt.user_name === user.user_name ? Trigger = false: null
+        })
 
-  // Add more service methods for testing if needed
+        Trigger? this.Users.push({user_name: Date.now(), ...user}): null;
+    }
+
+    removeUser(user_name: string){
+        let removedUser = this.getUser(user_name)
+        this.Users = this.Users.filter(user => user.user_name !== user_name)
+
+        return removedUser
+    }
+
+    confirm_user(user_name: string, password: string){
+        try {
+            let user = this.Users.find(usr => usr.user_name === user_name)
+
+            if(user && user.password === password){
+                return true
+            }else{
+                return false
+            }
+        } catch (error) {
+            console.log(error) 
+        }
+    }
 }

@@ -1,84 +1,59 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { NoteRepository } from './notes.repository';  // Import the repository
-import { Note } from './entities/note.entity';
-import { User } from '../users/entities/user.entity';
+import { Injectable } from '@nestjs/common';
 import { CreateNoteDto } from './dto/create-note.dto';
+import { UpdateNoteDto } from './dto/update-notes.dto';
+import { Result } from 'postcss';
 
 @Injectable()
-export class NoteService {
-  findOneOrFail(id: number) {
-    throw new Error('Method not implemented.');
-  }
-  constructor(
-    @InjectRepository(NoteRepository)  // Inject the repository
-    private readonly noteRepository: NoteRepository,
-  ) {}
+export class NotesService {
 
-  async create(user: User, createNoteDto: CreateNoteDto): Promise<Note> {
-    const { title, content } = createNoteDto;
-    const note = this.noteRepository.create({ title, content, user });
-    return this.noteRepository.save(note);
-  }
+    private Notes: Array<CreateNoteDto> = [
+        {id: 1705006307122, title: 'one', content: 'Hellow Word!', owner: 'DagmawiElias'},
+        {id: 1705006307123, title: 'two', content: 'You there World?', owner: 'DagmawiElias'},
+        {id: 1705006307124, title: 'three', content: 'Bye Word!', owner: 'DagmawiElias'},
+        {id: 1705006307125, title: 'four',content: 'you still here?', owner: 'DagmawiElias'}
+    ]
 
-  async findAll(user: User): Promise<Note[]> {
-    return this.noteRepository.find({ where: { user } });
-  }
+    getNote(id: number){
+        let note =  this.Notes.find(note => note.id === id)
 
-  async findOne(user: User, noteId: number): Promise<Note> {
-    const note = await this.findNoteById(noteId);
+        if(!note) {throw new Error('Note not found')}
 
-    this.checkUserPermission(user, note);
-
-    return note;
-  }
-
-  async findOneByTitle(user: User, title: string): Promise<Note> {
-    const note = await this.noteRepository.findOne({ where: { user, title } });
-
-    if (!note) {
-      throw new NotFoundException(`Note with title ${title} not found`);
+        return note
     }
 
-    return note;
-  }
-
-  async update(user: User, noteId: number, title: string, content: string): Promise<Note> {
-    const note = await this.findNoteById(noteId);
-    this.checkUserPermission(user, note);
-
-    // Update note properties
-    note.title = title;
-    note.content = content;
-
-    // Save the updated note
-    return this.noteRepository.save(note);
-  }
-
-  async remove(user: User, noteId: number): Promise<void> {
-    const note = await this.findNoteById(noteId);
-
-    // Check if the user has permission to delete this note
-    this.checkUserPermission(user, note);
-
-    await this.noteRepository.remove(note);
-  }
-
-  private async findNoteById(noteId: number): Promise<Note> {
-    const note = await this.noteRepository.findOneById(noteId);
-
-    if (!note) {
-      throw new NotFoundException(`Note with ID ${noteId} not found`);
+    getNotes(){
+        //video 4
+        return this.Notes
     }
 
-    return note;
-  }
+    update_notes(id: number, UpdateNoteDto: UpdateNoteDto){
 
+        this.Notes = this.Notes.map( Nt => {
+            if(Nt.id === id){
+                return {...Nt, ...UpdateNoteDto};
+            }
 
-  private checkUserPermission(user: User, note: Note): void {
-    // Check if the user has permission to access or modify this note
-    if (user.role === 'User' && note.user.id !== user.id) {
-      throw new ForbiddenException('You do not have permission to access or modify this note.');
+            return Nt
+        })
+
+        return this.getNote(id)
     }
-  }
+
+    addNote(note: CreateNoteDto){
+
+        let Trigger:boolean = true;
+
+        this.Notes.map(nt =>{
+            nt.id === note.id ? Trigger = false: null
+        })
+
+        Trigger? this.Notes.push({id: Date.now(), ...note}): null;
+    }
+
+    removeNote(ID: number){
+        let removedNote = this.getNote(ID)
+        this.Notes = this.Notes.filter(note => note.id !== ID)
+        // return removedNote
+        return this.getNotes()
+    }
 }

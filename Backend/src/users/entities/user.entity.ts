@@ -5,9 +5,9 @@ import { Note } from '../../notes/entities/note.entity';
 @Entity('User')
 export class User{
     @PrimaryGeneratedColumn()
-   id:number;
-    
-   @Column()
+    id:number;
+
+    @Column()
     name: string;
 
     @Column({unique:true})
